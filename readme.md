@@ -1,10 +1,10 @@
 # SocialFeed
 
-Get feeds from different social networks in a unified format
+Get feeds from different social networks in a unified format.
 
 ## Install
 
-Use composer: `composer require codeurs/social-feed`
+Use composer: `composer require jessicadigital/social-feed`
 
 ## Features
 
