@@ -22,6 +22,8 @@
         "aodto/phasher": "dev-master"
     },
     "autoload": {
-        "files": ["src/SocialFeed.php"]
+        "psr-4": {
+            "JessicaDigital\\SocialFeed\\":"src/"
+         }
     }
 }
