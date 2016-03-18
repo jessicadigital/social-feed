@@ -3,10 +3,7 @@
 namespace JessicaDigital\SocialFeed\Items;
 
 class Video {
-	/** @var string */
-	public $service;
-	/** @var string */
-	public $id;
-	/** @var string */
-	public $image;
+    public $id;
+    public $image;
+    public $service;
 }

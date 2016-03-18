@@ -7,7 +7,6 @@ class CredentialError extends \Exception {
     protected $service = null;
     
     public function __construct($service, $credential = 'unknown') {
-        $this->service = $service;
         $this->credential = $credential;
     }
     

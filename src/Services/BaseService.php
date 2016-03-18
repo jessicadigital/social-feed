@@ -2,7 +2,9 @@
 
 namespace JessicaDigital\SocialFeed\Services;
 
+use JessicaDigital\SocialFeed\Errors;
 use JessicaDigital\SocialFeed\Items;
+use JessicaDigital\SocialFeed\Media;
 
 /**
  * Extend to provide a social medium
@@ -52,80 +54,31 @@ abstract class BaseService {
     public function getItemFromUrl($url) {
         return $this->getItem($this->getIdFromUrl($url));
     }
-
-    protected function mediaFromUrl($url) {
-        $media = new Items\Media();
-        $video = new Items\Video();
-        switch (1) {
-            case preg_match('/vine\.co\/v\/([a-z0-9]+)/i', $url, $matches):
-                    $video->id = $matches[1];
-                    $video->service = 'vine';
-                    $vine = @file_get_contents("http://vine.co/v/{$video->id}");
-                    if ($vine !== false) {
-                            preg_match('/property="og:image" content="(.*?)"/', $vine, $images);
-                            if (isset($images[1]) && $images[1] != '')
-                                    $video->image = $images[1];
-                    }
-                    break;
-            case preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i', $url, $matches):
-                    $video->id = $matches[1];
-                    $video->service = 'youtube';
-                    $video->image = "http://img.youtube.com/vi/{$video->id}/hqdefault.jpg";
-                    break;
-            case preg_match('/https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/i', $url, $matches):
-                    $video->id = $matches[3];
-                    $video->service = 'vimeo';
-                    break;
-            case preg_match('/instagram\.com\/p\/([a-z0-9-_]+)\//i', $url, $matches):
-                            $data = @file_get_contents('http://api.instagram.com/oembed?url='.urlencode($url));
-                            if ($data !== false) {
-                                    $info = json_decode($data);
-                                    if (strpos($info->html, 'video') > -1) {
-                                            $video->id = $matches[0];
-                                            $video->service = 'instagram';
-                    $video->image = isset($info->thumbnail_url) ? $info->thumbnail_url : null;
-                } else {
-                    $media->image = isset($info->thumbnail_url) ? $info->thumbnail_url : null;
-                                    }
-                            }
-                            break;
-                    case preg_match('/facebook\.com\/.+\/videos\/([0-9]+)\//i', $url, $matches):
-                            $video->id = $matches[1];
-                            $video->service = 'facebook';
-                            $video->image = "https://graph.facebook.com/{$video->id}/picture?type=large";
-                            break;
-                    //case preg_match('/amp\.twimg\.com\/v\/([a-z0-9-]+)/i', $url, $matches):
-        default:
-            $video = null;
-            break;
-            }
-    if ($video == null || $video->service == null || $video->id == null) $video = null;
-            $media->video = $video;
-            return $media;
+    
+    public function linkify($text) {
+        return $text;
     }
 
-protected function process(Items\Item $item) {
-    return $item;
-}
-
     protected function requireCredentialKeys(array $keys, array $credentials) {
-            foreach ($keys as $key)
-                    if (!array_key_exists($key, $credentials))
-                            throw $this->e("Missing credential $key");
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $credentials)) {
+                throw new Errors\CredentialError($key);
+            }
+        }
     }
 
     protected function getCredentials() {
         if (!isset($this->credentials)) {
-            throw new \JessicaDigital\SocialFeed\Errors\CredentialError($this->service, 'all');
+            throw new Errors\CredentialError($this->service, 'all');
         }
         return $this->credentials;
     }
 
     protected function serviceError($error) {
-        return new \JessicaDigital\SocialFeed\Errors\ServiceError("Service {$this->service} reports error: $error");
+        return new Errors\ServiceError("Service {$this->service} reports error: $error");
     }
-
-    protected function e($msg) {
-        return new \Exception($msg);
+    
+    public function writeFeed($feed, $file) {
+        file_put_contents($file, $this->getFeed($feed));
     }
 }
