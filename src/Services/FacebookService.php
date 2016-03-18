@@ -2,92 +2,71 @@
 
 namespace JessicaDigital\SocialFeed\Services;
 
+use JessicaDigital\SocialFeed\Errors\ServiceError;
+use JessicaDigital\SocialFeed\Items\FacebookItem;
+
 class FacebookService extends BaseService {
 	const API_URL = 'https://graph.facebook.com/v2.3/';
-
+        
+        private $accesstoken;
+        protected $connection;
 	protected $service = 'facebook';
-	protected $connection;
+        
+        public function __construct($credentials) {
+            $this->setCredentials($credentials);
+        }
 
 	public function setCredentials(array $credentials) {
-		$this->requireCredentialKeys(['app_id', 'app_secret'], $credentials);
-		$this->credentials = (object) $credentials;
+            $this->requireCredentialKeys(['app_id', 'app_secret'], $credentials);
+            $this->credentials = (object) $credentials;
 	}
+        
+        private function getAccessToken() {
+            $request = @file_get_contents(self::API_URL.'oauth/access_token?client_id='.$this->credentials->app_id.'&client_secret='.$this->credentials->app_secret.'&grant_type=client_credentials');
+            if (empty($request)) {
+                throw new ServiceError('Unable to fetch access token.');
+            }
+            $data = json_decode($request);
+            if (empty($data->access_token)) {
+                throw new ServiceError('No access token available.');
+            }
+            $this->accesstoken = $data->access_token;
+        }
 
 	public function getFeed($username) {
-		$response = [];
-		$user = $this->getGraph("$username");
-		$id = $user->id;
-		$data = $this->getGraph("$username/feed");
-		foreach ($data->data as $item) {
-			$item = $this->parseItem($item, $id);
-			if ($item !== null)
-				$response[] = $item;
-		}
-		return $response;
+            $user = $this->getGraph($username);
+            return $this->getFeedById($user->id);
 	}
+        
+        public function getFeedById($id) {
+            $response = [];
+            $data = $this->getGraph($id.'/posts', 'fields=picture,message,from,created_time,likes.limit(1).summary(true),shares,comments.limit(1).summary(true)&limit=100');
+            foreach ($data->data as $item) {
+                $response[] = new FacebookItem($item);
+            }
+            return $response;
+        }
 
 	public function getItem($id) {
-		return $this->parseItem($this->getGraph($id));
+            return $this->parseItem($this->getGraph($id));
 	}
+        
+        public function getIdFromUrl($url) {
+            if (preg_match('/\/posts\/([0-9]+)/i', $url, $matches)) {
+                return $matches[1];
+            }
+        }
 
-	public function getIdFromUrl($url) {
-		if (preg_match('/\/posts\/([0-9]+)/i', $url, $matches)) {
-			return $matches[1];
-		}
-		$request = @file_get_contents("https://graph.facebook.com/?ids=".urlencode($url));
-		if ($request === false)
-			return null;
-		$data = json_decode($request);
-		return $data->{$url}->id;
-	}
-
-	protected function getGraph($endpoint) {
-		$credentials = $this->getCredentials();
-		$request = @file_get_contents(self::API_URL.$endpoint."?access_token={$credentials->app_id}|{$credentials->app_secret}");
-		if ($request === false) {
-			throw $this->serviceError('Could not load feed, check credentials');
-		}
-		return json_decode($request);
-	}
-
-	private function parseItem($item, $id = null) {
-		if ($id !== null && $item->from->id != $id)
-			return null;
-
-		$response = new Item();
-		$user = new User();
-		$media = new Media();
-		$response->service = $this->service;
-		$response->id = $item->id;
-		$response->created = strtotime($item->created_time);
-		$user->id = $item->from->id;
-		$user->name = $item->from->name;
-		$user->image = "https://graph.facebook.com/v2.3/{$user->id}/picture/";
-		$user->link = "https://facebook.com/profile.php?id={$user->id}";
-		$response->link = $item->link;//"http://www.facebook.com/permalink.php?id={$user->id}&v=wall&story_fbid={$response->id}";
-		if (isset($item->message))
-			$response->text = $item->message;
-		if (isset($item->type)) {
-			switch ($item->type) {
-				case 'photo':
-					$media->image = "https://graph.facebook.com/{$item->object_id}/picture?type=normal";
-					break;
-				case 'video':
-					$media = $this->mediaFromUrl($item->link);
-			}
-		}
-
-		if (isset($item->images)) {
-			$total = count($item->images);
-			if ($total > 1)
-				$media->image = $item->images[1]->source;
-			else if ($total == 1)
-				$media->image = $item->images[0]->source;
-		}
-
-		$response->user = $user;
-		$response->media = $media;
-		return $this->process($response);
+	protected function getGraph($endpoint, $attributes = '') {
+            if (empty($this->accesstoken)) {
+                $this->getAccessToken();
+            }
+            $url = self::API_URL.$endpoint.'?access_token='.$this->accesstoken.'&'.$attributes;
+            $request = json_decode(@file_get_contents($url));
+            if (empty($request)) {
+                throw new ServiceError('Could not load feed, check access token for request '.$url);
+            }
+            return $request;
 	}
 
 }

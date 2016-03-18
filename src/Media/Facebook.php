@@ -7,9 +7,9 @@ class Facebook extends Media {
     public $image;
     public $type = 'facebook';
     
-    public function __construct(string $url, int $id = 0) {
+    public function __construct($url, $id = 0) {
         $this->url = $url;
         $this->id = $id;
-        $this->image = 'https://graph.facebook.com/'.$this->id.'/picture?type=large';
+        $this->image = empty($id) ? $url : 'https://graph.facebook.com/'.$this->id.'/picture?type=large';
     }
 }
