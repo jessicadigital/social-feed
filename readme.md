@@ -37,3 +37,9 @@ The following credentials are needed depending on the medium:
 - Pinterest: [none]
 - Twitter: consumer_key, consumer_secret, access_token, access_token_secret
 - Youtube: api_key
+
+## Usage
+
+The services provided through this package query various social service APIs. In the interests of service availability, please use this package to fetch data at scheduled intervals, e.g. using a CRON job, and caching the data on your server. The easiest way to cache data is to write the JSON feed to a text file, e.g. 
+
+```file_put_contents($filename, json_encode($data));```
