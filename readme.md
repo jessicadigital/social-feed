@@ -17,72 +17,22 @@ Use composer: `composer require jessicadigital/social-feed`
 
 ## Example
 
-### Facebook
+### Twitter
 
 ```php
-$feed = new SocialFeed();
-
-// Input api credentials
-$feed->facebook->setCredentials([
-  'app_id' => '__',
-  'app_secret' => '__'
-]);
-
-// Get all recent posts for user 'codeurs.be'
-$data = $feed->facebook->getFeed('codeurs.be');
-foreach ($data as $item) {
-  // ...
-}
-
-// Get a single facebook post
-$item = $feed->facebook->getItem('646338148755451_704084252980840');
-
-// Get an id or item from a facebook url
-$id = $feed->facebook->getIdFromUrl('https://www.facebook.com/_/photos/_/?type=1&theater');
-$item = $feed->facebook->getItemFromUrl('https://www.facebook.com/_/photos/_/?type=1&theater');
-```
-
-### Output
-
-Output returns the following format (as a php object; printed as json for readability):
-
-```json
-{
-  "service": "facebook",
-  "text": "Example.",
-  "link": "https://www.facebook.com/____",
-  "id": "_",
-  "created": 1428764403,
-  "user": {
-    "id": "_",
-    "image": "https://graph.facebook.com/v2.3/_/picture/",
-    "name": "_",
-    "handle": null,
-    "link": "https://facebook.com/profile.php?id=_"
-  },
-  "media": {
-    "image": "https://graph.facebook.com/_/picture?type=normal",
-    "video": null
-  }
-}
-```
-
-If a video is present, information will be available in media.video:
-
-```json
-{
-  "image": null,
-  "video": {
-    "service": "youtube",
-    "id": "_",
-    "image": "http://img.youtube.com/vi/_/hqdefault.jpg"
-  }
-}
+$twitter = new JessicaDigital\SocialFeed\Services\TwitterService(array(
+  'access_token' => 'xxx',
+  'access_token_secret' => 'xxx',
+  'consumer_key' => 'xxx',
+  'consumer_secret' => 'xxx'
+));
+$feed = $twitter->getFeed('jessica_digital');
 ```
 
 ## Credentials
 
 The following credentials are needed depending on the medium:
 - Facebook: app_id, app_secret
-- Twitter: consumer_key, consumer_secret, access_token, access_token_secret
 - Instagram: client_id, client_secret
+- Twitter: consumer_key, consumer_secret, access_token, access_token_secret
+- Youtube: api_key
