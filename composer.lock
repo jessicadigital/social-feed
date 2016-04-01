@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ba314d6bdea9414db321634ee37df334",
-    "content-hash": "7cd09ad388fd73f682fbf1294a214414",
+    "hash": "4f84030e9dd5bffb21457b8f47ff37a0",
+    "content-hash": "6276ffce887a5be7d139860ec6818c03",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -60,55 +60,12 @@
                 "twitter"
             ],
             "time": "2015-08-18 15:56:04"
-        },
-        {
-            "name": "aodto/phasher",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/aodto/phasher.git",
-                "reference": "7c634f68ec7dfb9fe9506d20b97a55ba00c90499"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/aodto/phasher/zipball/7c634f68ec7dfb9fe9506d20b97a55ba00c90499",
-                "reference": "7c634f68ec7dfb9fe9506d20b97a55ba00c90499",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "src"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHasher",
-                    "homepage": "https://github.com/kennethrapp/phasher"
-                }
-            ],
-            "description": "Image Processing Library for comparing images",
-            "homepage": "https://github.com/aodto/phasher",
-            "keywords": [
-                "phash",
-                "phasher"
-            ],
-            "time": "2014-12-17 07:47:35"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "aodto/phasher": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

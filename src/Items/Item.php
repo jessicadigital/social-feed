@@ -2,8 +2,7 @@
 
 namespace JessicaDigital\SocialFeed\Items;
 
-
-use JessicaDigital\SocialFeed\Media\Media;
+use JessicaDigital\SocialFeed\Media;
 
 abstract class Item {
     public $created;
@@ -35,6 +34,15 @@ abstract class Item {
         }
         else if (preg_match('/facebook\.com\/.+\/videos\/([0-9]+)\//i', $url, $matches)) {
             $media = new Media\Facebook($url, $matches[1]);
+        }
+        else if (preg_match('/facebook\.com\/.+\/videos\/([0-9]+)\//i', $url, $matches)) {
+            $media = new Media\Facebook($url, $matches[1]);
+        }
+        else if (preg_match('/pinimg\.com\//i', $url, $matches)) {
+            $media = new Media\Pinterest($url, $matches[1]);
+        }
+        else {
+            $media = new Media\Generic($url);
         }
         return $media;
     }

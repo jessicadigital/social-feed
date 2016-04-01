@@ -8,9 +8,7 @@ class CredentialError extends \Exception {
     
     public function __construct($service, $credential = 'unknown') {
         $this->credential = $credential;
-    }
-    
-    public function getMessage() {
-        return sprintf('Missing credentials for service %s: %s', $this->service, $this->credential);
+        
+        $this->message = sprintf('Missing credentials for service %s: %s', $this->service, $this->credential);
     }
 }
