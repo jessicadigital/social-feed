@@ -7,11 +7,11 @@ use JessicaDigital\SocialFeed\Items\FacebookItem;
 
 class FacebookService extends BaseService {
 	const API_URL = 'https://graph.facebook.com/v2.3/';
-        
+
         private $accesstoken;
         protected $connection;
 	protected $service = 'facebook';
-        
+
         public function __construct($credentials) {
             $this->setCredentials($credentials);
         }
@@ -20,7 +20,7 @@ class FacebookService extends BaseService {
             $this->requireCredentialKeys(['app_id', 'app_secret'], $credentials);
             $this->credentials = (object) $credentials;
 	}
-        
+
         private function getAccessToken() {
             $request = @file_get_contents(self::API_URL.'oauth/access_token?client_id='.$this->credentials->app_id.'&client_secret='.$this->credentials->app_secret.'&grant_type=client_credentials');
             if (empty($request)) {
@@ -37,10 +37,10 @@ class FacebookService extends BaseService {
             $user = $this->getGraph($username);
             return $this->getFeedById($user->id);
 	}
-        
+
         public function getFeedById($id) {
             $response = [];
-            $data = $this->getGraph($id.'/posts', 'fields=picture,message,from,created_time,likes.limit(1).summary(true),shares,comments.limit(1).summary(true)&limit=100');
+            $data = $this->getGraph($id.'/posts', 'fields=full_picture,message,from,created_time,likes.limit(1).summary(true),shares,comments.limit(1).summary(true)&limit=20');
             foreach ($data->data as $item) {
                 $response[] = new FacebookItem($item);
             }
@@ -50,7 +50,7 @@ class FacebookService extends BaseService {
 	public function getItem($id) {
             return $this->parseItem($this->getGraph($id));
 	}
-        
+
         public function getIdFromUrl($url) {
             if (preg_match('/\/posts\/([0-9]+)/i', $url, $matches)) {
                 return $matches[1];

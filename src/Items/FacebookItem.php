@@ -9,9 +9,9 @@ class FacebookItem extends Item {
     protected $comments = 0;
     protected $likes = 0;
     public $service = 'facebook';
-    
+
     public function __construct($data) {
-        
+
         $this->id = $data->id;
         $this->comments = $data->comments->summary->total_count;
         $this->created = strtotime($data->created_time);
@@ -19,19 +19,19 @@ class FacebookItem extends Item {
         $this->link = 'http://www.facebook.com/permalink.php?id='.$data->from->id.'&v=wall&story_fbid='.$data->id;
         $this->livetext = $this->linkify($data->message);
         $this->text = $data->message;
-        
+
         $user = new User();
         $user->id = $data->from->id;
         $user->image = 'https://graph.facebook.com/v2.3/'.$data->from->id.'/picture/';
         $user->link = 'https://facebook.com/profile.php?id='.$data->from->id;
         $user->name = $data->from->name;
         $this->user = $user;
-        
+
         if (!empty($data->picture)) {
-            $this->media = new Facebook($data->picture);
+            $this->media = new Facebook($data->full_picture);
         }
     }
-    
+
     public function linkify($text) {
         // linkify URLs
         $text = preg_replace(

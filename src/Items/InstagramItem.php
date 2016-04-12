@@ -6,9 +6,9 @@ use JessicaDigital\SocialFeed\Media\Instagram;
 
 class InstagramItem extends Item {
     public $service = 'instagram';
-    
+
     public function __construct($data) {
-        
+
         $user = new \JessicaDigital\SocialFeed\Items\User();
         $user->handle = $data->user->username;
         $user->id = $data->user->id;
@@ -16,7 +16,7 @@ class InstagramItem extends Item {
         $user->link = 'https://instagram.com/'.$data->user->username;
         $user->name = $data->user->full_name;
         $this->user = $user;
-        
+
         $this->id = $data->id;
         $this->created = (int) $data->created_time;
         $this->link = $data->link;
@@ -24,10 +24,10 @@ class InstagramItem extends Item {
         $this->livetext = $this->linkify($data->caption->text);
 
         if (!empty($data->images->standard_resolution->url)) {
-            $this->media = new Instagram($data->images->standard_resolution->url);
+            $this->media = new Instagram(str_replace('s150x150', 's640x640', $data->images->thumbnail->url));
         }
     }
-    
+
     public function linkify($text) {
         // linkify URLs
         $text = preg_replace(
