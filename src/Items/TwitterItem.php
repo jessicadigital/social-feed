@@ -30,7 +30,7 @@ class TwitterItem extends Item {
 
         if (!empty($data->extended_entities->media)) {
             $img = $data->extended_entities->media[0];
-            $media->image = $img->media_url_https;
+            $this->media = $img->media_url_https;
         }
 
         if (isset($data->entities->urls)) {
